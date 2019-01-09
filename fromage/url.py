@@ -2,33 +2,32 @@ import re
 
 from .errors import InvalidForumUrl, EnumOutOfRange
 from .enums import resolveEnum, Forum, Community, Section, Location
-
-def match(pattern, string):
-	match = re.search(pattern, string)
-	if match is None:
-		return
-	groups = match.groups()
-	if len(groups)==0:
-		return match.group(0)
-	elif len(groups)==1:
-		return groups[0]
-	else:
-		return groups
+from .strings import FORUM_LINK
 
 class Url:
-	def __init__(self, href):
-		match = re.match(r'/?([^?]+)\??(.*)$', href)
+	def __init__(self, uri, anchor=None, **params):
+		self.uri = uri
+		self.params = params
+		self.anchor = anchor
+
+	def __str__(self):
+		p = ['{}={}'.format(k,v) for k,v in self.params.items()]
+		p = '?'+'&'.join(p) if len(p) else ''
+		return '{}{}{}'.format(FORUM_LINK, self.uri, p)
+
+	@classmethod
+	def parseUrlData(cls, href):
+		match = re.search(r'/?([^?]+)\??(.*)$', href.replace(FORUM_LINK, ''))
 		if match is None:
 			raise InvalidForumUrl(href)
+		uri, raw_params = match.groups()
 
-		self.uri  = match.group(1)
-		self.raw_data = match.group(2)
+		params = {m.group(1):m.group(2) for m in re.finditer(r'([^&]+)=([^&#]+)') if m is not None}
 
-		matches = re.findall(r'([^&]+)=([^&#]+)', self.raw_data)
-		self.data = {k:int(v) if v.isalnum() else v for k,v in matches}
+		match = re.search(r'#(.*?)$', href)
+		anchor = match.group(1) if match else None
 
-		self.id = match(r'#(.+)$', self.raw_data)
-		self.num_id = int(match(r'#.*?(\d+).*$', self.raw_data) or -1)
+		return cls(uri, anchor, **params)
 
 def getLocation(forum, community, section):
 	forum     = resolveEnum(forum, Forum)
@@ -48,8 +47,3 @@ def getLocation(forum, community, section):
 		'f': resolveEnum(forum, Forum, True),
 		's': s
 	}
-
-def formatNickname(nickname):
-	assert isinstance(nickname, str)
-
-	return nickname.replace('%23','#', 1).capitalize()

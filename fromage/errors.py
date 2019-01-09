@@ -27,7 +27,7 @@ class InvalidExtension(FromaigeError):
 class InvalidFile(FromaigeError):
 	"""Provided file does not exist."""
 class InvalidForumUrl(FromaigeError):
-	"""Invalid Atelier801's url."""
+	"""Invalid Atelier801's url. ({})"""
 class InvalidId(FromaigeError):
 	"""Invalid id."""
 class InvalidUser(FromaigeError):
@@ -35,13 +35,13 @@ class InvalidUser(FromaigeError):
 class NoPollResponses(FromaigeError):
 	"""Missing poll responses. There must be at least two responses."""
 class NoRequiredFields(FromaigeError):
-	"""The fields {fields} are needed."""
+	"""The fields {} are needed."""
 class NoTribeError(FromaigeError):
 	"""This instance does not have a tribe."""
 class NoUrlLocation(FromaigeError):
 	"""Missing location."""
 class NoUrlLocationPrivate(FromaigeError):
-	"""The fields {fields} are needed if the object is private."""
+	"""The fields {} are needed if the object is private."""
 class NotConnected(FromaigeError):
 	"""This instance is not connected yet, connect first."""
 class NotPollError(FromaigeError):

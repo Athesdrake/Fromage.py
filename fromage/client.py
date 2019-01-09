@@ -2,8 +2,9 @@ __all__ = ['Client']
 
 import asyncio
 import re
+import time
 
-from .errors import AlreadyConnected
+from .errors import AlreadyConnected, NotConnected
 from .strings import CookieState, ForumUri, HtmlChunk, FORUM_LINK
 from .utils.shakikoo import shakikoo
 from .user import User
@@ -12,14 +13,11 @@ from .http import HTTPClient
 class Client:
 	# TODO: __doc__
 	def __init__(self, loop=None):
-		self.username = None
-		# self.password = password if encrypted else shakikoo(password)
-
 		self.connected = False
-		self.user_id   = 0
-		self.tribe_id  = 0
+		self.user = None
 
 		self.cookieState = CookieState.login
+		self._connectionTime = -1
 
 		# Whether the account has a validated its account with a code
 		self.hasCertificate = False
@@ -29,6 +27,12 @@ class Client:
 		self.loop = loop
 
 		self.http = HTTPClient(loop=loop)
+
+	@property
+	def connectionTime(self):
+		if self._connectionTime<0:
+			return self._connectionTime
+		return time.clock() - self._connectionTime
 
 	async def close(self):
 		await self.http.close()
@@ -77,6 +81,18 @@ class Client:
 			self.cookieState = CookieState.after_login
 
 			self.user = await User.get(username)
+			self._connectionTime = time.clock()
+
+	async def logout(self):
+		if not self.connected:
+			raise NotConnected()
+
+		await self.http.performAction(ForumUri.disconnection, ajaxUri=ForumUri.acc)
+		self.connected = False
+		self.user = None
+		self.cookieState = CookieState.login
+		self.hasCertificate = False
+		self._connectionTime = -1
 
 	def run(self, *args, **kwargs):
 		self.loop.run_until_complete(self.connect(*args, **kwargs))

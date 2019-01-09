@@ -19,5 +19,5 @@ if __name__ == '__main__':
 	loop = asyncio.get_event_loop()
 	loop.run_until_complete(test())
 
-# TODO: compile regex
-# TODO: add events
+# TODO: speed up dev
+# TODO: add on_event
