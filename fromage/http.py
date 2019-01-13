@@ -123,6 +123,9 @@ def do_not_steal_my_cookies(_loop=None):
 		async def getPage(self, url, **kw):
 			return await self.request(Route.get(url, **kw))
 
+		async def getPageContent(self, url, **kw):
+			return await self.request_content(Route.get(url, **kw))
+
 	return HTTPClient
 
 HTTPClient = do_not_steal_my_cookies()
