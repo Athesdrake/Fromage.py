@@ -7,8 +7,8 @@ from .strings import FORUM_LINK
 class Url:
 	def __init__(self, uri, anchor=None, **params):
 		self.uri = uri
-		self.params = params
 		self.anchor = anchor
+		self.params = params
 
 	def __str__(self):
 		p = ['{}={}'.format(k,v) for k,v in self.params.items()]
@@ -16,7 +16,7 @@ class Url:
 		return '{}{}{}'.format(FORUM_LINK, self.uri, p)
 
 	@classmethod
-	def parseUrlData(cls, href):
+	def parse(cls, href):
 		match = re.search(r'/?([^?]+)\??(.*)$', href.replace(FORUM_LINK, ''))
 		if match is None:
 			raise InvalidForumUrl(href)
@@ -28,6 +28,13 @@ class Url:
 		anchor = match.group(1) if match else None
 
 		return cls(uri, anchor, **params)
+
+	@classmethod
+	def redirect(cls, result):
+		match = re.search(r'"redirection":"(.*?)"', result)
+		if match is None:
+			raise InvalidForumUrl()
+		return cls.parse(match.group(1))
 
 def getLocation(forum, community, section):
 	forum     = resolveEnum(forum, Forum)
