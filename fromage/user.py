@@ -158,6 +158,10 @@ class User:
 
 		return cls(username, hashtag, id, **data)
 
+	@property
+	def profileUri(self):
+		return '{}?pr={}'.format(ForumUri.profile, self.id if self.id>0 else self.username)
+
 	# @property
 	# def tribe(self):
 	# 	return Tribe(self.tribeId, client=self._client)

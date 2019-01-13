@@ -20,4 +20,5 @@ if __name__ == '__main__':
 	loop.run_until_complete(test())
 
 # TODO: speed up dev
+# TODO: add docs
 # TODO: add on_event
